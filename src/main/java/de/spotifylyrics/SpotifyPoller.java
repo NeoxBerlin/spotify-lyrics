@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 /** Fragt regelmaessig ab, was auf Spotify gerade laeuft. */
 public class SpotifyPoller {
-    public record Playback(String id, String title, String artist, String mainArtist, String album,
+    public record Playback(String id, String title, String artist, String mainArtist, String album, String coverUrl,
                            long durationMs, long progressMs, boolean playing, long fetchedNanos) {
         /** Geschaetzter aktueller Fortschritt (zwischen zwei Abfragen wird hochgezaehlt). */
         public long estimatedProgressMs() {
@@ -57,7 +57,7 @@ public class SpotifyPoller {
     private void bad(String s) { status = s; problem = true; }
 
     public void start() {
-        executor.scheduleWithFixedDelay(this::tick, 1000, Math.max(1000, config.pollIntervalMs), TimeUnit.MILLISECONDS);
+        executor.scheduleWithFixedDelay(this::tick, 1000, Math.max(500, config.pollMs), TimeUnit.MILLISECONDS);
     }
 
     private void tick() {
@@ -129,11 +129,29 @@ public class SpotifyPoller {
         }
         String album = item.has("album") && item.get("album").isJsonObject()
                 ? item.getAsJsonObject("album").get("name").getAsString() : "";
+        String cover = "";
+        JsonArray imgs = null;
+        if (item.has("album") && item.get("album").isJsonObject() && item.getAsJsonObject("album").has("images")) {
+            imgs = item.getAsJsonObject("album").getAsJsonArray("images");
+        } else if (item.has("images") && item.get("images").isJsonArray()) {
+            imgs = item.getAsJsonArray("images");
+        }
+        if (imgs != null) {
+            int best = Integer.MAX_VALUE;
+            for (JsonElement el : imgs) {
+                JsonObject im = el.getAsJsonObject();
+                int w = im.has("width") && !im.get("width").isJsonNull() ? im.get("width").getAsInt() : 0;
+                if (cover.isEmpty() || (w >= 64 && w < best)) {
+                    cover = im.get("url").getAsString();
+                    if (w >= 64) best = w;
+                }
+            }
+        }
         long duration = item.has("duration_ms") ? item.get("duration_ms").getAsLong() : 0;
         long progress = o.has("progress_ms") && !o.get("progress_ms").isJsonNull() ? o.get("progress_ms").getAsLong() : 0;
         boolean playing = o.has("is_playing") && o.get("is_playing").getAsBoolean();
 
-        Playback p = new Playback(id, title, artists.toString(), main, album, duration, progress, playing, fetchedNanos);
+        Playback p = new Playback(id, title, artists.toString(), main, album, cover, duration, progress, playing, fetchedNanos);
         current = p;
         ok(playing ? "Spielt" : "Pausiert");
         boolean isTrack = !o.has("currently_playing_type") || "track".equals(o.get("currently_playing_type").getAsString());

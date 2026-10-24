@@ -44,13 +44,17 @@ Die Jar liegt danach in `build/libs/`.
 | Option | Bedeutung |
 |---|---|
 | `clientId` | Client ID deiner Spotify-App |
-| `enabled` | Lyrics anzeigen |
+| `enabled` | Karte anzeigen |
+| `posX`, `posY` | Position der Karte (Pixel vom linken/oberen Rand, Standard 6/6 = oben links) |
+| `cardWidth` | Breite der Karte |
+| `showCover` | Albumcover anzeigen |
+| `showProgress` | Fortschrittsbalken mit Zeit anzeigen |
 | `showSurroundingLines` | vorherige/nächste Zeile abgedunkelt mitanzeigen |
-| `showTitle` | Titel und Künstler anzeigen |
+| `wordByWord` | Wörter der aktuellen Zeile nacheinander grün aufleuchten lassen |
 | `offsetMs` | Timing verschieben (positiv = Zeilen früher) |
-| `bottomMargin` | Abstand zum unteren Bildrand |
-| `maxWidth` | maximale Breite der Box |
-| `pollIntervalMs` | Abfrageintervall bei Spotify (min. 1000) |
+| `pollMs` | Abfrageintervall bei Spotify (min. 500, Standard 1000) |
+
+Hinweis: Öffnest du mit F3 das Debug-Menü, überdeckt es die Karte oben links. Mit `posX`/`posY` kannst du sie verschieben.
 
 ## Fehlersuche
 

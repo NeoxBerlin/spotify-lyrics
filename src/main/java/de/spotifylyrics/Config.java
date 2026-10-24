@@ -13,16 +13,24 @@ public class Config {
     /** Client ID deiner Spotify-App (developer.spotify.com/dashboard). */
     public String clientId = "";
     public boolean enabled = true;
+
+    /** Position der Karte (GUI-Pixel vom linken/oberen Bildrand). */
+    public int posX = 6;
+    public int posY = 6;
+    /** Breite der Karte. */
+    public int cardWidth = 230;
+
+    public boolean showCover = true;
+    public boolean showProgress = true;
+    /** Vorherige und naechste Zeile abgedunkelt anzeigen. */
     public boolean showSurroundingLines = true;
-    public boolean showTitle = true;
+    /** Woerter der aktuellen Zeile nacheinander gruen aufleuchten lassen. */
+    public boolean wordByWord = true;
+
     /** Verschiebt die Lyrics zeitlich. Positiv = Zeilen erscheinen frueher. */
     public int offsetMs = 0;
-    /** Abstand vom unteren Bildrand (ueber der Hotbar). */
-    public int bottomMargin = 70;
-    /** Maximale Breite der Lyrics-Box in GUI-Pixeln. */
-    public int maxWidth = 320;
     /** Wie oft Spotify abgefragt wird (ms). Dazwischen wird der Fortschritt berechnet. */
-    public int pollIntervalMs = 2000;
+    public int pollMs = 1000;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -41,8 +49,9 @@ public class Config {
         } catch (Exception e) {
             SpotifyLyricsClient.LOGGER.warn("Konnte Config nicht lesen, nutze Standardwerte", e);
         }
-        if (cfg.pollIntervalMs < 1000) cfg.pollIntervalMs = 1000;
-        cfg.save(); // schreibt fehlende Felder / legt Datei beim ersten Start an
+        if (cfg.pollMs < 500) cfg.pollMs = 500;
+        if (cfg.cardWidth < 160) cfg.cardWidth = 160;
+        cfg.save(); // schreibt neue Felder / legt Datei beim ersten Start an
         return cfg;
     }
 

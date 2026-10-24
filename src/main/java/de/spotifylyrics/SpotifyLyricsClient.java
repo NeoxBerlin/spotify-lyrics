@@ -20,6 +20,7 @@ public class SpotifyLyricsClient implements ClientModInitializer {
     public static SpotifyAuth AUTH;
     public static SpotifyPoller POLLER;
     public static LyricsManager LYRICS;
+    public static CoverArt COVER;
 
     private static KeyMapping toggleKey;
 
@@ -27,6 +28,7 @@ public class SpotifyLyricsClient implements ClientModInitializer {
     public void onInitializeClient() {
         CONFIG = Config.load();
         LYRICS = new LyricsManager();
+        COVER = new CoverArt();
         AUTH = new SpotifyAuth(CONFIG);
         POLLER = new SpotifyPoller(CONFIG, AUTH, LYRICS);
 
